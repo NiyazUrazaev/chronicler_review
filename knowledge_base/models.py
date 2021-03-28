@@ -2,6 +2,22 @@ from django.db import models
 from enum import Enum
 
 # Create your models here.
+from review_process.models import Project
+
+
+class SetProjectMixin(models.Model):
+    """Добавляем ссылку на проект"""
+
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        verbose_name='Проект, к которому относятся правила',
+        null=True,
+        blank=True,
+    )
+
+    class Meta:
+        abstract = True
 
 
 class DjangoApps(models.Model):
@@ -48,7 +64,7 @@ class DirectoryMixin(models.Model):
         abstract = True
 
 
-class AbbreviationRules(models.Model):
+class AbbreviationRules(SetProjectMixin):
     """
     Модель для формирования базы знаний по соглашениям на аббревиатуры
     """
@@ -123,7 +139,7 @@ class ProjectFile(models.Model):
         verbose_name_plural = 'Файлы'
 
 
-class AppStructureRules(models.Model):
+class AppStructureRules(SetProjectMixin):
     """
     Модель для формирования базы знаний по соглашениям на структуру модуля
     """
@@ -188,7 +204,7 @@ class AppStructureProjectFiles(models.Model):
         verbose_name_plural = 'Отношения абревиатур и дирекций'
 
 
-class ProjectStructureRules(models.Model):
+class ProjectStructureRules(SetProjectMixin):
     """
     Модель для формирования базы знаний по соглашениям на структуру проекта
     """
@@ -228,7 +244,7 @@ class DocStringParams(models.Model):
         verbose_name_plural = 'Параметры для докстрингов'
 
 
-class DocStringMethodsRules(models.Model):
+class DocStringMethodsRules(SetProjectMixin):
     """
     Модель для формирования базы знаний по соглашениям на структуру докстрингов у метода
     """

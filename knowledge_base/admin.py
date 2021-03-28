@@ -68,14 +68,17 @@ class AbbreviationRulesAdmin(admin.ModelAdmin):
         'tag_name_ru',
         'tag_name_code',
         'description',
+        'project',
     )
     list_display = (
         'tag_name_ru',
         'tag_name_code',
         'description',
+        'project',
     )
     list_filter = (
         'directory',
+        'project',
     )
     inlines = (
         AbbreviationDirectoriesInline,
@@ -167,11 +170,14 @@ class AppStructureFilesInline(admin.TabularInline):
 class AppStructureRulesAdmin(admin.ModelAdmin):
     fields = (
         'app_names',
+        'project',
     )
     list_display = (
+        'project',
         'app_names',
     )
     list_filter = (
+        'project',
         'directory',
         'must_be_files'
     )
