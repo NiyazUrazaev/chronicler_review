@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.http import HttpResponseRedirect
 from django.urls import path, reverse
 
+from review_process.helpers import create_review
 from review_process.models import Project
 
 
@@ -35,7 +36,10 @@ class ProjectAdmin(admin.ModelAdmin):
         return my_urls + urls
 
     def get_review(self, request, project_id):
-        print('lol')
+
+        project = Project.objects.get(id=project_id)
+        result = create_review(project)
+
         return HttpResponseRedirect(
             reverse('admin:review_process_project_change',
                     kwargs={'object_id': project_id})

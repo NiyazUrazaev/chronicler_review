@@ -21,6 +21,9 @@ class Project(models.Model):
         verbose_name='Ссылка на репозиторий',
     )
 
+    def __str__(self):
+        return f'Id: {self.id}, {self.name}'
+
     class Meta:
         verbose_name = 'Проект'
         verbose_name_plural = 'Проекты'

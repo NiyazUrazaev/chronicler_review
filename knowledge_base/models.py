@@ -134,6 +134,9 @@ class ProjectFile(models.Model):
         blank=True,
     )
 
+    def __str__(self):
+        return f'Id: {self.id}, {self.file_name}'
+
     class Meta:
         verbose_name = 'Файл'
         verbose_name_plural = 'Файлы'
@@ -180,8 +183,8 @@ class AppStructureDirectories(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Отношение абревиатуры и дирекции'
-        verbose_name_plural = 'Отношения абревиатур и дирекций'
+        verbose_name = 'Директория, к которой относится правило'
+        verbose_name_plural = 'Директории, к которым относятся правила'
 
 
 class AppStructureProjectFiles(models.Model):
@@ -200,8 +203,8 @@ class AppStructureProjectFiles(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Отношение абревиатуры и дирекции'
-        verbose_name_plural = 'Отношения абревиатур и дирекций'
+        verbose_name = 'Файл, который должен быть в модуле'
+        verbose_name_plural = 'Файлы, которые должны быть в модуле'
 
 
 class ProjectStructureRules(SetProjectMixin):
