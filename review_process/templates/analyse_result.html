@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Результат анализа проекта</title>
+    <style>
+        .container {
+            position: relative;
+        }
+        .child {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%);
+        }
+        .styled-table {
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 0.9em;
+            font-family: sans-serif;
+            min-width: 400px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+        }
+        .styled-table thead tr {
+            background-color: rgb(77, 118, 141);
+            color: #ffffff;
+            text-align: left;
+        }
+        .styled-table th,
+        .styled-table td {
+            padding: 12px 15px;
+        }
+        .styled-table tbody tr {
+            border-bottom: 1px solid #dddddd;
+        }
+        .styled-table tbody tr:nth-of-type(even) {
+            background-color: #f3f3f3;
+        }
+        .styled-table tbody tr:last-of-type {
+            border-bottom: 2px solid rgb(77, 118, 141);
+        }
+        .styled-table tbody tr.active-row {
+            font-weight: bold;
+            color: rgb(77, 118, 141);
+        }.styled-table tbody tr.active-row {
+            font-weight: bold;
+            color: rgb(77, 118, 141);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="child">
+            <table class="styled-table">
+                <thead>
+                    <tr>
+                        <th>Project name</th>
+                        <th>Exception message</th>
+                        <th>Exception type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for project_name, exceptions in data %}
+                        <tr class="active-row">
+                            <td>{{ project_name }}</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        {% for element in exceptions %}
+                            <tr>
+                                <td></td>
+                                <td>{{ element.exception_message }}</td>
+                                <td>{{ element.exception_type.value }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

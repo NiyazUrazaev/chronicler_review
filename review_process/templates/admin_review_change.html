@@ -2,7 +2,7 @@
 
 {% block object-tools-items %}
     <li>
-        <a href="{% url 'admin:get_review' project_id=original.pk %}" class="btn btn-high btn-success">Провести анализ проекта</a>
+        <a href="{% url 'admin:get_review' project_id=original.pk %}" class="btn btn-high btn-success" target="_blank">Провести анализ проекта</a>
     </li>
     {{ block.super }}
 {% endblock %}
