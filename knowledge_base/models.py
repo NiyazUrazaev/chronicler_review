@@ -242,6 +242,14 @@ class DocStringParams(models.Model):
         blank=True,
     )
 
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        verbose_name='Проект, к которому относятся правила',
+        null=True,
+        blank=True,
+    )
+
     class Meta:
         verbose_name = 'Параметр для докстринга'
         verbose_name_plural = 'Параметры для докстрингов'

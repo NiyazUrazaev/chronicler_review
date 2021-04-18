@@ -1,10 +1,11 @@
 import git
 import os
+import re
 
 from django.conf import settings
 from git import Repo
 
-from knowledge_base.models import ProjectStructureRules
+from knowledge_base.models import ProjectStructureRules, DocStringParams
 from review_process.models import ExceptionTypes
 
 
@@ -39,7 +40,7 @@ def check_for_structure_rules(project_structure_rules, repo_dir):
                 try:
                     files_in_dir = os.listdir(checked_dir)
                 except FileNotFoundError:
-                    print(f'Not existing directory: {checked_dir}')
+                    print(f'WARNING: Not existing directory: {checked_dir}')
                     continue
                 for file in app_rule.must_be_files.all():
                     if file.file_name not in files_in_dir:
@@ -48,13 +49,58 @@ def check_for_structure_rules(project_structure_rules, repo_dir):
                             'exception_message': exception_message,
                             'exception_type': ExceptionTypes.PROJECT_STRUCTURE
                         })
-                        print(exception_message)
+
+    return exceptions
+
+
+def check_for_docstring_rules(docstring_rules, repo_dir):
+    """Проверка на docstring"""
+
+    exceptions = {}
+    excluded_files = [
+        'manage.py',
+        # Only for testing
+        'views.py',
+        'models.py',
+    ]
+    for rule in docstring_rules:
+        exceptions[rule.project.name] = []
+
+        for root, subdirs, files in os.walk(repo_dir):
+            for filename in files:
+                if filename in excluded_files:
+                    continue
+                file_path = os.path.join(root, filename)
+                with open(file_path, 'r') as f:
+                    try:
+                        f_content = f.read()
+                    except UnicodeDecodeError:
+                        print(f'WARNING: Unicode decode at {file_path}')
+                        continue
+                    docstrings = re.findall(r'\"\"\".+\"\"\"', f_content)
+                    for string in docstrings:
+                        if rule.param_name not in string:
+                            exception_path = file_path.split('clonned_repos')[-1]
+                            exception_message = f'Info: in file {exception_path} docstring {string} has not param {rule.param_name}'
+                            exceptions[rule.project.name].append({
+                                'exception_message': exception_message,
+                                'exception_type': ExceptionTypes.DOC_STRING_PARAMS
+                            })
 
     return exceptions
 
 
 def create_review(projects_qs):
     """Проведение анализа проекта"""
+
+    def _merge_two_dicts(x, y):
+        z = x.copy()
+        for key, value in y.items():
+            if key not in z:
+                z[key] = value
+            else:
+                z[key].extend(value)
+        return z
 
     review_result = {}
     repo_dir = os.path.join(settings.BASE_DIR, 'clonned_repos')
@@ -70,12 +116,15 @@ def create_review(projects_qs):
             repo_dir = os.path.join(repo_dir, project.name)
             git.cmd.Git(repo_dir).pull()
 
+        # Проверка на структуру проекта
         project_structure_rules = ProjectStructureRules.objects.filter(project=project)
-        exceptions = check_for_structure_rules(project_structure_rules, repo_dir)
+        review_result.update(_merge_two_dicts(review_result, check_for_structure_rules(project_structure_rules, repo_dir)))
+
+        # Проверка на докстринги
+        docstring_rules = DocStringParams.objects.filter(project=project)
+        review_result.update(_merge_two_dicts(review_result, check_for_docstring_rules(docstring_rules, repo_dir)))
 
         repo = Repo(repo_dir)
-
-        review_result.update(exceptions)
 
     return review_result
 
