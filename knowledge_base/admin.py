@@ -67,18 +67,21 @@ class AbbreviationRulesAdmin(admin.ModelAdmin):
     fields = (
         'tag_name_ru',
         'tag_name_code',
+        'abbreviation_type',
         'description',
         'project',
     )
     list_display = (
         'tag_name_ru',
         'tag_name_code',
+        'abbreviation_type',
         'description',
         'project',
     )
     list_filter = (
         'directory',
         'project',
+        'abbreviation_type',
     )
     inlines = (
         AbbreviationDirectoriesInline,

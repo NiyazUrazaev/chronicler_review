@@ -68,6 +68,15 @@ class AbbreviationRules(SetProjectMixin):
     """
     Модель для формирования базы знаний по соглашениям на аббревиатуры
     """
+
+    MUST_BE = 1
+    SHOULDNT_BE = 2
+
+    ABBREVIATION_TYPES = (
+        (MUST_BE, 'Присутсвует'),
+        (SHOULDNT_BE, 'Не присутствует'),
+    )
+
     tag_name_ru = models.CharField(
         max_length=128,
         verbose_name='Аббревиатура'
@@ -76,6 +85,13 @@ class AbbreviationRules(SetProjectMixin):
     tag_name_code = models.CharField(
         max_length=128,
         verbose_name='Название аббревиатуры в коде',
+    )
+
+    abbreviation_type = models.IntegerField(
+        choices=ABBREVIATION_TYPES,
+        verbose_name='Тип аббревиатуры',
+        null=True,
+        blank=True,
     )
 
     description = models.TextField(

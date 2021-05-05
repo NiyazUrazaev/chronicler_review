@@ -35,3 +35,4 @@ class ExceptionTypes(Enum):
 
     PROJECT_STRUCTURE = 'Структура проекта'
     DOC_STRING_PARAMS = 'Параметр в строковой документации'
+    ABBREVIATION_RULE = 'Правило на аббревиатуру'
