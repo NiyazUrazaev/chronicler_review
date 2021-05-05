@@ -44,7 +44,7 @@ def check_for_structure_rules(project_structure_rules, repo_dir):
                     continue
                 for file in app_rule.must_be_files.all():
                     if file.file_name not in files_in_dir:
-                        exception_message = f'Warning: directory {directory} has not file {file.file_name}'
+                        exception_message = f'В директории {directory} нет файла {file.file_name}'
                         exceptions[rule.project.name].append({
                             'exception_message': exception_message,
                             'exception_type': ExceptionTypes.PROJECT_STRUCTURE
@@ -81,7 +81,7 @@ def check_for_docstring_rules(docstring_rules, repo_dir):
                     for string in docstrings:
                         if rule.param_name not in string:
                             exception_path = file_path.split('clonned_repos')[-1]
-                            exception_message = f'Info: in file {exception_path} docstring {string} has not param {rule.param_name}'
+                            exception_message = f'В файле {exception_path}, строковой документации {string}, нет параметра {rule.param_name}'
                             exceptions[rule.project.name].append({
                                 'exception_message': exception_message,
                                 'exception_type': ExceptionTypes.DOC_STRING_PARAMS

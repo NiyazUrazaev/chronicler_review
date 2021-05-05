@@ -33,5 +33,5 @@ class Project(models.Model):
 
 class ExceptionTypes(Enum):
 
-    PROJECT_STRUCTURE = 'Project structure'
-    DOC_STRING_PARAMS = 'Doc string parameter'
+    PROJECT_STRUCTURE = 'Структура проекта'
+    DOC_STRING_PARAMS = 'Параметр в строковой документации'
