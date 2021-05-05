@@ -3,6 +3,7 @@ beautifulsoup4==4.9.3
 certifi==2020.12.5
 chardet==4.0.0
 Django==3.1.7
+django-admin-colors==0.2.0
 django-regex-field==2.0.2
 esprima==4.0.1
 gitdb==4.0.5

@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'knowledge_base',
     'review_process',
+    'admincolors',
 ]
 
 MIDDLEWARE = [
@@ -53,14 +54,34 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'chronicler_review.urls'
 
+# Choose a base theme
+# If empty or not set, the first option of ADMIN_COLORS will be chosen
+ADMIN_COLORS_BASE_THEME = 'Gray'
+# These are the "builtin" django-admin-colors themes
+ADMIN_COLORS = [
+    ('Default', []),
+    ('Lite', 'admincolors/css/lite.css'),
+    ('Dark Blue', 'admincolors/css/dark-blue.css'),
+    ('Gray', 'admincolors/css/gray.css')
+]
+
+# TEMPLATES configuration
+# PS: Don't override your current settings,
+#     copy or change only what's necessary
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
+        'DIRS': [
+            # IMPORTANT: needed to override the django admin's base templates.
+            os.path.join(BASE_DIR, 'templates')
+        ],
+        # IMPORTANT: needed to load admincolors' templates
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                # IMPORTANT: needed to make the "theme" and "themes" context
+                #            variables available for the templates
+                'admincolors.context_processors.admin_theme',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
