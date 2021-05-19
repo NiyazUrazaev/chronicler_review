@@ -2,12 +2,15 @@ from django import forms
 from django.contrib import admin
 
 # Register your models here.
+from django.utils.html import format_html
+
+from chronicler_review import settings
 from knowledge_base.models import (
     DjangoApps, AbbreviationRules,
     ProjectFile, AppStructureRules,
     ProjectStructureRules, DocStringParams,
     DocStringMethodsRules, AbbreviationDirectories, AppStructureDirectories, AppStructureProjectFiles,
-    APIStructureProjectFiles, APIRules, APIStructureDirectories,
+    APIStructureProjectFiles, APIRules, APIStructureDirectories, Link, Notion, NotionToNotion,
 )
 
 admin.site.register(AbbreviationDirectories)
@@ -312,3 +315,55 @@ class APIRulesAdmin(admin.ModelAdmin):
 
     app_names.short_description = 'Названия директорий'
 
+
+class NotionInline(admin.TabularInline):
+    fields = (
+        'current_notion',
+        'link_type',
+        'next_notion',
+        'next_notion_link',
+    )
+    readonly_fields = (
+        'current_notion',
+        'next_notion_link',
+    )
+    extra = 0
+    fk_name = 'prev_notion'
+
+    model = NotionToNotion
+
+    def current_notion(self, obj):
+        if obj and obj.prev_notion:
+            return obj.prev_notion.notion_text
+        return self.get_empty_value_display()
+
+    current_notion.short_description = 'Текущее понятие'
+
+    def next_notion_link(self, obj):
+        if obj and obj.next_notion:
+            url = settings.SITE_URL + f'admin/knowledge_base/notion/{obj.next_notion.id}/change/'
+            return format_html(f'<a href={url}>Понятие<a/>')
+        return self.get_empty_value_display()
+
+    next_notion_link.short_description = 'Ссылка на следующее понятие'
+
+
+@admin.register(Notion)
+class NotionAdmin(admin.ModelAdmin):
+    fields = (
+        'notion_text',
+        'description',
+    )
+    list_display = (
+        'notion_text',
+        'description',
+    )
+    list_filter = (
+        'notion_text',
+    )
+    inlines = (
+        NotionInline,
+    )
+
+
+admin.site.register(Link)

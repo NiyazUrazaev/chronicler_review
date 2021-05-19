@@ -30,12 +30,46 @@ class Project(models.Model):
         blank=True,
     )
 
+    notions = models.ManyToManyField(
+        'knowledge_base.Notion',
+        verbose_name='Понятия',
+        through='ProjectToNotion',
+        related_name='%(app_label)s_%(class)s_notions',
+    )
+
     def __str__(self):
         return f'Id: {self.id}, {self.name}'
 
     class Meta:
         verbose_name = 'Проект'
         verbose_name_plural = 'Проекты'
+
+
+class ProjectToNotion(models.Model):
+
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        verbose_name='Предыдущее понятие',
+    )
+
+    notion = models.ForeignKey(
+        'knowledge_base.Notion',
+        on_delete=models.CASCADE,
+        verbose_name='Понятие',
+    )
+
+    link_type = models.ForeignKey(
+        'knowledge_base.Link',
+        on_delete=models.CASCADE,
+        verbose_name='Тип связи',
+        null=True,
+        blank=True,
+    )
+
+    class Meta:
+        verbose_name = 'Понятия'
+        verbose_name_plural = 'Понятия'
 
 
 class ExceptionTypes(Enum):

@@ -2,9 +2,42 @@ from django.contrib import admin
 
 from django.template.response import TemplateResponse
 from django.urls import path
+from django.utils.html import format_html
 
+from chronicler_review import settings
 from review_process.helpers import create_review
-from review_process.models import Project
+from review_process.models import Project, ProjectToNotion
+
+
+class NotionInline(admin.TabularInline):
+    fields = (
+        'project_name',
+        'link_type',
+        'notion',
+        'next_notion',
+    )
+    readonly_fields = (
+        'project_name',
+        'next_notion',
+    )
+    extra = 0
+
+    model = ProjectToNotion
+
+    def project_name(self, obj):
+        if obj and obj.project:
+            return obj.project.name
+        return self.get_empty_value_display()
+
+    project_name.short_description = 'Название проекта'
+
+    def next_notion(self, obj):
+        if obj and obj.notion:
+            url = settings.SITE_URL + f'admin/knowledge_base/notion/{obj.notion.id}/change/'
+            return format_html(f'<a href={url}>Понятие<a/>')
+        return self.get_empty_value_display()
+
+    next_notion.short_description = 'Ссылка на понятие'
 
 
 @admin.register(Project)
@@ -25,6 +58,9 @@ class ProjectAdmin(admin.ModelAdmin):
         'name',
         'git_url',
         'description',
+    )
+    inlines = (
+        NotionInline,
     )
 
     change_form_template = 'admin_review_change.html'

@@ -354,3 +354,75 @@ class APIStructureDirectories(models.Model):
     class Meta:
         verbose_name = 'Директория, к которой относится правило'
         verbose_name_plural = 'Директории, к которым относятся правила'
+
+
+class Link(models.Model):
+
+    link_name = models.CharField(
+        max_length=123,
+        verbose_name='Тип связи',
+    )
+
+    def __str__(self):
+        return f'{self.link_name}'
+
+    class Meta:
+        verbose_name = 'Тип связи'
+        verbose_name_plural = 'Типы связи'
+
+
+class Notion(models.Model):
+
+    notion_text = models.CharField(
+        max_length=200,
+        verbose_name='Понятие',
+    )
+
+    description = models.TextField(
+        null=True,
+        blank=True,
+        verbose_name='Описание понятия'
+    )
+
+    next_notion = models.ManyToManyField(
+        'Notion',
+        verbose_name='Следующее понятие',
+        through='NotionToNotion',
+        related_name='%(app_label)s_%(class)s_notions',
+    )
+
+    def __str__(self):
+        return self.notion_text
+
+    class Meta:
+        verbose_name = 'Понятие'
+        verbose_name_plural = 'Понятия'
+
+
+class NotionToNotion(models.Model):
+
+    prev_notion = models.ForeignKey(
+        Notion,
+        on_delete=models.CASCADE,
+        verbose_name='Предыдущее понятие',
+        related_name='%(app_label)s_%(class)s_prev_notions',
+    )
+
+    next_notion = models.ForeignKey(
+        Notion,
+        on_delete=models.CASCADE,
+        verbose_name='Следующее понятие',
+        related_name='%(app_label)s_%(class)s_next_notions',
+    )
+
+    link_type = models.ForeignKey(
+        Link,
+        on_delete=models.CASCADE,
+        verbose_name='Тип связи',
+        null=True,
+        blank=True,
+    )
+
+    class Meta:
+        verbose_name = 'Следующее понятие'
+        verbose_name_plural = 'Следующие понятия'
