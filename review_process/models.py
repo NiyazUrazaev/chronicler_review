@@ -23,6 +23,13 @@ class Project(models.Model):
         verbose_name='Ссылка на репозиторий',
     )
 
+    root_directory = models.CharField(
+        max_length=123,
+        verbose_name='Корневая директория',
+        null=True,
+        blank=True,
+    )
+
     def __str__(self):
         return f'Id: {self.id}, {self.name}'
 
@@ -36,3 +43,4 @@ class ExceptionTypes(Enum):
     PROJECT_STRUCTURE = 'Структура проекта'
     DOC_STRING_PARAMS = 'Параметр в строковой документации'
     ABBREVIATION_RULE = 'Правило на аббревиатуру'
+    API_RULE = 'Правило на структуру API'

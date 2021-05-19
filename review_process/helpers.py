@@ -5,7 +5,7 @@ import re
 from django.conf import settings
 from git import Repo
 
-from knowledge_base.models import ProjectStructureRules, DocStringParams, AbbreviationRules
+from knowledge_base.models import ProjectStructureRules, DocStringParams, AbbreviationRules, APIRules
 from review_process.models import ExceptionTypes
 
 
@@ -133,6 +133,50 @@ def check_for_abbreviation_rules(abbreviation_rules, repo_dir):
     return exceptions
 
 
+def check_for_api_rules(api_rules, repo_dir):
+    """Проверка на аббревиатуры"""
+
+    exceptions = {}
+    # Only for testing
+    excluded_files = [
+        'manage.py',
+        # 'views.py',
+        'models.py',
+        '__init__.py',
+    ]
+    for rule in api_rules:
+        exceptions[rule.project.name] = []
+        for rule_directory in rule.directory.all():
+            repo_dir = os.path.join(repo_dir, rule_directory.app_name_code)
+            for root, subdirs, files in os.walk(repo_dir):
+                for filename in files:
+                    if filename in excluded_files:
+                        continue
+                    for rule_file in rule.project_files.all():
+                        exception_message = ''
+                        if filename != rule_file.file_name:
+                            continue
+                        file_path = os.path.join(root, filename)
+                        with open(file_path, 'r') as f:
+                            try:
+                                f_content = f.read()
+                            except UnicodeDecodeError:
+                                print(f'WARNING: Unicode decode at {file_path}')
+                                continue
+
+                            exception_path = file_path.split('clonned_repos')[-1]
+                            if rule.function_name not in f_content:
+                                exception_message = f'В файле {exception_path} отсутсвует метод {rule.function_name}'
+
+                            if exception_message:
+                                exceptions[rule.project.name].append({
+                                    'exception_message': exception_message,
+                                    'exception_type': ExceptionTypes.API_RULE,
+                                })
+
+    return exceptions
+
+
 def create_review(projects_qs):
     """Проведение анализа проекта"""
 
@@ -171,7 +215,13 @@ def create_review(projects_qs):
         abbreviation_rules = AbbreviationRules.objects.filter(project=project)
         review_result.update(_merge_two_dicts(review_result, check_for_abbreviation_rules(abbreviation_rules, repo_dir)))
 
-        repo = Repo(repo_dir)
+        if project.root_directory is not None:
+            repo_dir = os.path.join(repo_dir, project.root_directory)
+        # Проверка на структуру API
+        api_rules = APIRules.objects.filter(project=project)
+        review_result.update(_merge_two_dicts(review_result, check_for_api_rules(api_rules, repo_dir)))
+
+        # repo = Repo(repo_dir)
 
     return review_result
 

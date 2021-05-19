@@ -131,8 +131,8 @@ class AbbreviationDirectories(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Отношение аббревиатуры и дирекции'
-        verbose_name_plural = 'Отношения аббревиатур и дирекций'
+        verbose_name = 'Дирекция, к которой относится аббревиатура'
+        verbose_name_plural = 'Дирекции, к которым относится аббревиатура'
 
 
 class ProjectFile(models.Model):
@@ -285,3 +285,72 @@ class DocStringMethodsRules(SetProjectMixin):
     class Meta:
         verbose_name = 'Комментарий у метода'
         verbose_name_plural = 'Комментарии у метода'
+
+
+class APIRules(SetProjectMixin):
+    """
+    Модель для формирования базы знаний по правилам на структуру API
+    """
+    function_name = models.CharField(
+        max_length=123,
+        verbose_name='Название метода в API'
+    )
+
+    project_files = models.ManyToManyField(
+        ProjectFile,
+        verbose_name='Файлы, к которым относится правило',
+        through='APIStructureProjectFiles',
+        blank=True,
+    )
+
+    directory = models.ManyToManyField(
+        DjangoApps,
+        related_name='%(app_label)s_%(class)s_directories',
+        verbose_name="Директории к которым относится правило",
+        through='APIStructureDirectories',
+        blank=True,
+    )
+
+    class Meta:
+        verbose_name = 'Правило на структуру API'
+        verbose_name_plural = 'Правила на структуру API'
+
+
+class APIStructureProjectFiles(models.Model):
+    """
+    Связующая структуры API и директорий
+    """
+    api_rule = models.ForeignKey(
+        APIRules,
+        on_delete=models.CASCADE,
+    )
+
+    project_file = models.ForeignKey(
+        ProjectFile,
+        on_delete=models.CASCADE,
+        verbose_name='Файл в проекте',
+    )
+
+    class Meta:
+        verbose_name = 'Файл, к которому относится правило'
+        verbose_name_plural = 'Файлы, к которым относится правило'
+
+
+class APIStructureDirectories(models.Model):
+    """
+    Связующая структуры API и директорий
+    """
+    api_rule = models.ForeignKey(
+        APIRules,
+        on_delete=models.CASCADE,
+    )
+
+    directory = models.ForeignKey(
+        DjangoApps,
+        on_delete=models.CASCADE,
+        verbose_name='Директория',
+    )
+
+    class Meta:
+        verbose_name = 'Директория, к которой относится правило'
+        verbose_name_plural = 'Директории, к которым относятся правила'

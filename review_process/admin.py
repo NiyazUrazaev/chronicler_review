@@ -1,9 +1,7 @@
 from django.contrib import admin
 
-# Register your models here.
-from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
-from django.urls import path, reverse
+from django.urls import path
 
 from review_process.helpers import create_review
 from review_process.models import Project
@@ -14,11 +12,13 @@ class ProjectAdmin(admin.ModelAdmin):
     fields = (
         'name',
         'git_url',
+        'root_directory',
         'description',
     )
     list_display = (
         'name',
         'git_url',
+        'root_directory',
         'description',
     )
     list_filter = (
